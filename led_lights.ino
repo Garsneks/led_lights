@@ -14,14 +14,16 @@ void wakeUp()
 {
   detachInterrupt(digitalPinToInterrupt(modeButton));
   sleep_disable();
-  ledsOn(true);
 }
 
 void ledsOn(bool state){
   if (state){
     digitalWrite(led1, HIGH);
+    delay(100);
     digitalWrite(led2, HIGH);
+    delay(100);
     digitalWrite(led3, HIGH);
+    delay(100);
     digitalWrite(led4, HIGH);
   }
   else{
@@ -38,25 +40,23 @@ void setup() {
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
   pinMode(led4, OUTPUT);
-  Serial.begin(9600);
   ledsOn(true);
 }
 
 void loop() {
-  Serial.println("do something");
   if (digitalRead(modeButton) == LOW){
     buttonPressTime = millis();
     while (digitalRead(modeButton) == LOW){
       timeNow = millis();
-      if ((buttonPressTime + 1000) <= timeNow){
-        digitalWrite(led1, LOW);
-      }
-      if ((buttonPressTime + 2000) <= timeNow){
-        digitalWrite(led2, LOW);
-      }
-      if ((buttonPressTime + 3000) <= timeNow){
+      if ((buttonPressTime + 1500) <= timeNow){
         goToSleep = true;
         digitalWrite(led3, LOW);
+      }
+      else if ((buttonPressTime + 1000) <= timeNow){
+        digitalWrite(led2, LOW);
+      }
+      else if ((buttonPressTime + 500) <= timeNow){
+        digitalWrite(led1, LOW);
       }
     }
     if (goToSleep != true){
