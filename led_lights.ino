@@ -1,14 +1,19 @@
 #include <avr/sleep.h>
 
 const int modeButton = 2;
-const int led1 = 9;
-const int led2 = 10;
-const int led3 = 11;
-const int led4 = 12;
+const int led1 = 10;
+const int led2 = 9;
+const int led3 = 6;
+const int led4 = 5;
 
 bool goToSleep = false;
 int buttonPressTime = 0;
 int timeNow = 0;
+
+int selectedMode = 0;
+const int finalMode = 2;
+int currentLed = 0;
+int ledArray[] = {255, 255, 255, 255};
 
 void wakeUp()
 {
@@ -18,19 +23,19 @@ void wakeUp()
 
 void ledsOn(bool state){
   if (state){
-    digitalWrite(led1, HIGH);
+    analogWrite(led1, 255);
     delay(100);
-    digitalWrite(led2, HIGH);
+    analogWrite(led2, 255);
     delay(100);
-    digitalWrite(led3, HIGH);
+    analogWrite(led3, 255);
     delay(100);
-    digitalWrite(led4, HIGH);
+    analogWrite(led4, 255);
   }
   else{
-    digitalWrite(led1, LOW);
-    digitalWrite(led2, LOW);
-    digitalWrite(led3, LOW);
-    digitalWrite(led4, LOW);
+    analogWrite(led1, 0);
+    analogWrite(led2, 0);
+    analogWrite(led3, 0);
+    analogWrite(led4, 0);
   }
 }
 
@@ -41,6 +46,7 @@ void setup() {
   pinMode(led3, OUTPUT);
   pinMode(led4, OUTPUT);
   ledsOn(true);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -50,18 +56,42 @@ void loop() {
       timeNow = millis();
       if ((buttonPressTime + 1500) <= timeNow){
         goToSleep = true;
-        digitalWrite(led3, LOW);
+        analogWrite(led3, 0);
       }
       else if ((buttonPressTime + 1000) <= timeNow){
-        digitalWrite(led2, LOW);
+        analogWrite(led2, 0);
       }
       else if ((buttonPressTime + 500) <= timeNow){
-        digitalWrite(led1, LOW);
+        analogWrite(led1, 0);
       }
     }
     if (goToSleep != true){
       ledsOn(true);
+      selectedMode = selectedMode + 1;
+      if (selectedMode > finalMode){
+        selectedMode = 0;
+      }
     }
+    
+  }
+  if (selectedMode == 1){
+    currentLed = random(sizeof(ledArray)/sizeof(int));
+    analogWrite(led1, ledArray[0]);
+    delay(200);
+    analogWrite(led2, ledArray[1]);
+    delay(200);
+    analogWrite(led3, ledArray[2]);
+    delay(200);
+    analogWrite(led4, ledArray[3]);
+    if (ledArray[currentLed] == 255){
+      ledArray[currentLed] = 100;
+    }
+    else{
+      ledArray[currentLed] = 255;
+    }
+  }
+  if (selectedMode == 2){
+    
   }
   if (digitalRead(modeButton) == HIGH && goToSleep){
     goToSleep = false;
