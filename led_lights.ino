@@ -14,6 +14,7 @@ int selectedMode = 0;
 const int finalMode = 2;
 int currentLed = 0;
 int ledArray[] = {255, 255, 255, 255};
+const int ledCount = sizeof(ledArray)/sizeof(int);
 
 void wakeUp()
 {
@@ -49,6 +50,17 @@ void setup() {
   Serial.begin(9600);
 }
 
+void runLedsWithDelay(int delayTime){
+  analogWrite(led1, ledArray[0]);
+    delay(delayTime);
+    analogWrite(led2, ledArray[1]);
+    delay(delayTime);
+    analogWrite(led3, ledArray[2]);
+    delay(delayTime);
+    analogWrite(led4, ledArray[3]);
+    delay(delayTime);
+}
+
 void loop() {
   if (digitalRead(modeButton) == LOW){
     buttonPressTime = millis();
@@ -75,14 +87,8 @@ void loop() {
     
   }
   if (selectedMode == 1){
-    currentLed = random(sizeof(ledArray)/sizeof(int));
-    analogWrite(led1, ledArray[0]);
-    delay(200);
-    analogWrite(led2, ledArray[1]);
-    delay(200);
-    analogWrite(led3, ledArray[2]);
-    delay(200);
-    analogWrite(led4, ledArray[3]);
+    currentLed = random(ledCount);
+    runLedsWithDelay(200);
     if (ledArray[currentLed] == 255){
       ledArray[currentLed] = 100;
     }
@@ -91,7 +97,13 @@ void loop() {
     }
   }
   if (selectedMode == 2){
-    
+    ledsOn(true);
+    if (currentLed == ledCount + 1){
+      currentLed = 0;
+    }
+    ledArray[currentLed] = 100;
+    runLedsWithDelay(200);
+    currentLed = currentLed + 1;
   }
   if (digitalRead(modeButton) == HIGH && goToSleep){
     goToSleep = false;
